@@ -1,0 +1,228 @@
+/* PodiumUI.css */
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+/* Modal Content */
+.modal-content {
+  position: relative;
+  background-color: #ffffff;
+  padding: 24px;
+  border-radius: 18px;
+  width: 80%;
+  max-width: 600px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Close Button (X) */
+.modal-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #333;
+}
+
+/* Modal Card Image */
+.modal-card-image {
+  display: flex;
+  justify-content: center;
+}
+
+.modal-card-image img {
+  max-width: 100%;
+  border-radius: 12px;
+}
+
+/* Modal Card Text */
+.modal-card-text {
+  font-size: 24px;
+  margin-top: 16px;
+  text-align: center;
+  color: #333;
+  font-weight: bold;
+}
+
+/* Modal Details */
+.modal-details {
+  margin-top: 20px;
+}
+
+.modal-detail {
+  margin-bottom: 12px;
+  font-size: 18px;
+  color: #333;
+}
+
+.modal-detail strong {
+  font-weight: 600;
+}
+
+.modal-detail a {
+  color: #007aff;
+  text-decoration: none;
+}
+
+.modal-detail a:hover {
+  text-decoration: underline;
+}
+
+/* Podium Card and Other Styles (no changes) */
+.podium-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #f7f7f7;
+  padding: 40px;
+  box-sizing: border-box;
+  width: auto;
+  overflow-x: hidden;
+}
+
+.podium-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Input field styling */
+.input-wrapper {
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 50px;
+  display: flex;
+  justify-content: center;
+}
+
+.input-field {
+  width: 100%;
+  padding: 16px;
+  font-size: 18px;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+  background-color: #ffffff;
+  color: #333333;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  font-family: inherit;
+}
+
+.input-field:focus {
+  border-color: #007aff;
+  box-shadow: 0 0 12px rgba(0, 122, 255, 0.2);
+}
+
+.podium-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  width: 100%;
+  max-width: 1000px;
+  align-items: end;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.podium-grid.animate {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Podium Card Styles */
+.podium-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  background-color: #ffffff;
+  color: #333333;
+  font-weight: 500;
+  text-align: center;
+  padding: 24px;
+  height: 320px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+  cursor: pointer;
+}
+
+.podium-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.12);
+  background-color: #f4f6f9;
+}
+
+.card-image {
+  width: 100%;
+  height: 60%; /* Image takes up 60% of the card */
+  display: flex;
+}
+
+.card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures the image fills the space while maintaining aspect ratio */
+  border-radius: 15px;
+}
+
+.card-content {
+  font-size: 22px;
+  line-height: 1.4;
+  color: #333333;
+  font-weight: 400;
+  padding-top: 10px;
+}
+
+.reroll-button {
+  margin-top: 20px;
+  padding: 12px 24px;
+  font-size: 18px;
+  background-color: #ffffff;
+  color: #333333;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.reroll-button:active{
+  background-color: #f4f6f9;
+  transform: translateY(-4px);
+}
+
+.reroll-button:focus {
+  outline: none;
+}
+
+@media only screen and (max-width: 600px) {
+  .podium-grid {
+    grid-template-columns: repeat(1, 1fr);
+    width: 80%;
+  }
+
+  .podium-card {
+    height: 200px;
+  }
+}

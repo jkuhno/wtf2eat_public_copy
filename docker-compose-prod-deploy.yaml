@@ -1,0 +1,37 @@
+services:
+  react-app:
+    image: jkuhno/wtf2eat:client-react-nginx-${IMAGE_TAG}
+    init: true
+    restart: unless-stopped
+    networks:
+      - frontend
+    ports:
+      - 443:443
+    logging:
+       driver: awslogs
+       options:
+         awslogs-group: /docker-compose-logs
+         awslogs-stream: compose-logs
+
+  api-server:
+    image: jkuhno/wtf2eat:api-server-${IMAGE_TAG}
+    restart: unless-stopped
+    init: true
+    env_file: ".env" 
+    environment:
+      - PYTHONPATH=/usr/src/app
+      - CF_TURNSTILE_SECRET=${CF_TURNSTILE_SECRET_PROD}
+      - POSTGRES_HOST=${POSTGRES_HOST_PROD}
+      - DOMAIN=https://wtf2eat.com
+    networks:
+      - frontend
+    ports:
+      - 8080:8080
+    logging:
+       driver: awslogs
+       options:
+         awslogs-group: /docker-compose-logs
+         awslogs-stream: compose-logs
+  
+networks:
+  frontend:

@@ -1,0 +1,38 @@
+services:
+  react-app:
+    image: client-react-nginx:latest
+    build:
+      context: ./react-app
+      dockerfile: Dockerfile
+      args:
+       - VITE_APP_BACKEND_ADDRESS=
+       - VITE_CF_TURNSTILE_SITE=${CF_TURNSTILE_SITE_PROD}
+    init: true
+    restart: unless-stopped
+    networks:
+      - frontend
+    ports:
+      - 443:443
+
+  api-server:
+    image: api-server:latest
+    restart: unless-stopped
+    build:
+      context: ./api_server
+      dockerfile: Dockerfile
+    init: true
+    env_file: ".env" 
+    environment:
+      - PYTHONPATH=/usr/src/app
+      - CF_TURNSTILE_SECRET=${CF_TURNSTILE_SECRET_PROD}
+      - POSTGRES_HOST=${POSTGRES_HOST_PROD}
+      - DOMAIN=https://wtf2eat.com
+    networks:
+      - frontend
+    ports:
+      - 8080:8080
+  
+networks:
+  frontend:
+
+  

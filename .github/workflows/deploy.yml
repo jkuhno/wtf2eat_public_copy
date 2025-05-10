@@ -1,0 +1,92 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build-and-push:
+    name: build && push image to docker hub
+    runs-on: self-hosted 
+    
+    steps:
+      - id: step1
+        name: Checkout repository
+        uses: actions/checkout@v4
+
+      - id: step2
+        name: Copy .env file to workspace
+        run: cp /mnt/c/Users/kuhno/devel/wtf2eat/.env $GITHUB_WORKSPACE/.env
+
+
+      - id: step3
+        name: ssl certs to workspace
+        run: cp -r /mnt/c/Users/kuhno/devel/wtf2eat/react-app/cert $GITHUB_WORKSPACE/react-app/cert
+    
+      - id: step4
+        name: docker login
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - id: step5
+        name: Build production image
+        run: |
+          docker compose -f docker-compose-prod-build.yaml build
+      
+
+      - id: step6
+        name: Tag and push image
+        run: |
+          COMMIT_HASH=$(git rev-parse --short HEAD)
+          echo "COMMIT_HASH=${COMMIT_HASH}" >> "$GITHUB_OUTPUT"
+          docker tag client-react-nginx:latest jkuhno/wtf2eat:client-react-nginx-$COMMIT_HASH
+          docker push jkuhno/wtf2eat:client-react-nginx-$COMMIT_HASH
+          docker tag api-server:latest jkuhno/wtf2eat:api-server-$COMMIT_HASH
+          docker push jkuhno/wtf2eat:api-server-$COMMIT_HASH
+        shell: bash
+
+    outputs:
+      imageTag: ${{ steps.step6.outputs.COMMIT_HASH }}
+
+  deploy:
+    name: Deploy to EC2
+    runs-on: self-hosted
+    needs: build-and-push
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get EC2 SSH private key
+        run: echo "${{ secrets.EC2_SSH_KEY }}" > ec2-docker-server-key.pem
+    
+      - name: Set Permissions for SSH Key
+        run: |
+          chmod 600 ec2-docker-server-key.pem
+
+      - name: Copy .env file to workspace
+        run: cp /mnt/c/Users/kuhno/devel/wtf2eat/.env $GITHUB_WORKSPACE/.env
+
+      - name: Copy Deployment Files to EC2
+        run: >
+            scp -i "ec2-docker-server-key.pem"
+            docker-compose-prod-deploy.yaml
+            .env
+            ec2-user@ec2-51-20-73-248.eu-north-1.compute.amazonaws.com:/home/ec2-user/wtf2eat/
+
+      - name: SSH into EC2 & Deploy
+        run: |
+          ssh -i "ec2-docker-server-key.pem" ec2@RETRACTED.compute.amazonaws.com << 'EOF'
+            echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+            export IMAGE_TAG=${{ needs.build-and-push.outputs.imageTag }}
+
+            docker-compose -f /home/ec2-user/wtf2eat/docker-compose-prod-deploy.yaml down
+            docker-compose -f /home/ec2-user/wtf2eat/docker-compose-prod-deploy.yaml up -d
+            
+            docker image prune -f -a
+          EOF
+        shell: bash
+
